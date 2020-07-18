@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Bee - Arduino</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      margin: 0;
+    }
+    #bk {
+      border-top: solid 5px #00a0e9;
+      width: calc(100% - 20px);
+      margin: 0;
+      padding: 10px;
+      background: #222;
+      color: #BBB;
+      text-align: center;
+    }
+    h3 {
+      margin: 0;
+      font-size: 0.8em;
+      font-weight: 100;
+    }
+    #bk2 {
+      margin: 0;
+      padding: 10px;
+      text-align: center;
+    }
+    button {
+      margin-top: 20px;
+      color: #BBB;
+      background: #222;
+      padding: 10px 30px;
+      border-radius: 2px;
+      border: none;
+    }
+    .ev {
+      animation: 1s ease 0s 1 alternate anim;
+    }
+    @keyframes anim {
+      0% {
+        border-top: solid 5px #00a0e9;
+      }
+      30% {
+        border-top: solid 5px #fff;
+      }
+      0% {
+        border-top: solid 5px #00a0e9;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="bk">
+  <h1 style="font-size: 1.5em;">Bee 自主研究</h1>
+  <h3>BinaryOperatingTEST<br>XHR > AzureServer > ControllUnit > TWE-LITE > Arduino</h3>
+</div>
+<div id="bk2">
+  <h4>Mode
+  <label><input type="radio" name="AUTO" value="1" id="AUTO" onchange="up_auto()">自動</label>
+  <label><input type="radio" name="AUTO" value="0" id="AUTO2" checked  onchange="up_auto()">手動</label></h4>
+  <div id="auto_h">
+  <h4>TWE-Lite ID:
+    <select id="ID" onchange="up_id()">
+      <option value="00">00 OC-XB</option>
+      <option value="11" selected>0B EV-6</option>
+      <option value="27">1B RV-3</option>
+      <option value="43">2B</option>
+      <option value="59">3B</option>
+      <option value="75">4B RH-2</option>
+    </select></h4>
+  <h4>DC-MOTOR [0-5V / 0-255*16ms]</h4>
+    <!-- <select id="DC_DIR">
+      <option value="1">正回転</option>
+      <option value="2">逆回転</option>
+    </select><br> -->
+    <label><input type="radio" name="DC_DIR" value="1" id="DC_DIR">←正回転</label>
+    <label><input type="radio" name="DC_DIR" value="2" id="DC_DIR2" checked>逆回転→</label><br>
+    <input type="range" name="DC_POWER" id="DC_POWER" min="0" max="255" step="1" onchange="up_dc_power()" style="padding: 5px 10px; margin-top: 20px;">
+    <label for="DC_POWER">POWER [<span id="dc_power_v"></span>]</label><br>
+    <input type="range" name="DC_TIMER" id="DC_TIMER" min="0" max="255" step="1" onchange="up_dc_timer()" style="padding: 5px 10px; margin-top: 10px;">
+    <label for="DC_TIMER">TIMER [<span id="dc_timer_v"></span>]</label>
+    <!-- <input type="text" id="DC_POWER"> -->
+    <!-- <input type="text" id="DC_TIMER"> -->
+
+  <div id="id_hi1">
+  <h4>SERVO-MOTOR [0-179°] (1B/4B)</h4>
+    <input type="range" name="SERVO" id="SERVO" min="0" max="179" step="1" onchange="up_servo()"style="padding: 5px 10px;">
+    <label for="SERVO">DEG [<span id="servo_deg"></span>]</label><br><br>
+    <!-- <input type="text" id="SERVO"> -->
+  </div>
+  <dir id="id_hi2">
+    <h4>Stepping-MOTOR [ 0-255*1.8°] (0B)</h4>
+    <label><input type="radio" name="SP_DIR" value="1" id="SP_DIR">←正回転</label>
+    <label><input type="radio" name="SP_DIR" value="2" id="SP_DIR2" checked>逆回転→</label><br>
+    <input type="range" name="SP_DEG" id="SP_DEG" min="0" max="255" step="1" onchange="up_sp_deg()" style="padding: 5px 10px; margin-top: 20px;">
+    <label for="SP_DEG">DEG [<span id="sp_deg_v"></span>]</label><br>
+  </dir>
+  </div>
+  <button onclick="send()">suBmit</button>
+</div>
+</body>
+<script>
+  up_servo();
+  up_dc_power();
+  up_dc_timer();
+  up_sp_deg();
+  up_auto();
+  up_id();
+  function up_servo() {
+    var servo_deg = document.getElementById("servo_deg");
+    var SERVO = document.getElementById("SERVO").value;
+    servo_deg.innerHTML = SERVO+'°';
+  }
+  function up_dc_power() {
+    var dc_power_v = document.getElementById("dc_power_v");
+    var DC_POWER = document.getElementById("DC_POWER").value;
+    dc_power_v.innerHTML = (5*DC_POWER/255).toFixed(2)+'V';
+  }
+  function up_dc_timer() {
+    var dc_timer_v = document.getElementById("dc_timer_v");
+    var DC_TIMER = document.getElementById("DC_TIMER").value;
+    dc_timer_v.innerHTML = (16*DC_TIMER/1000).toFixed(2)+'s';
+  }
+  function up_sp_deg() {
+    var sp_deg_v = document.getElementById("sp_deg_v");
+    var SP_DEG = document.getElementById("SP_DEG").value;
+    sp_deg_v.innerHTML = (SP_DEG*1.8).toFixed(1)+'°';
+  }
+  function up_auto() {
+    var auto = document.getElementById("AUTO");
+    var auto_h = document.getElementById("auto_h");
+    if (auto.checked) {
+      auto_h.style.display = "none";
+      sp_auto = 1;
+    } else {
+      auto_h.style.display = "block";
+      sp_auto = 0;
+    }
+  }
+  function up_id() {
+    var ID = document.getElementById("ID").value;
+    var id_hi1 = document.getElementById("id_hi1");
+    var id_hi2 = document.getElementById("id_hi2");
+    if (ID == '11') {
+      id_hi1.style.display = "none";
+      id_hi2.style.display = "block";
+    } else if (ID == '27' || ID == '75') {
+      id_hi1.style.display = "block";
+      id_hi2.style.display = "none";
+    } else {
+      id_hi1.style.display = "block";
+      id_hi2.style.display = "block";
+    }
+  }
+
+  function send() { // データをサーバに送信する関数
+    var SEND_SERVER = 'https://u2api.azurewebsites.net/bee/arduino.php';
+    var ID = document.getElementById("ID").value;
+    var DC_DIR = document.getElementById("DC_DIR");
+    var DC_POWER = document.getElementById("DC_POWER").value;
+    var DC_TIMER = document.getElementById("DC_TIMER").value;
+    var SERVO = document.getElementById("SERVO").value;
+    var SP_DIR = document.getElementById("SP_DIR");
+    var SP_DEG = document.getElementById("SP_DEG").value;
+    var bk = document.getElementById('bk');
+    bk.classList.remove("ev");
+
+    if(DC_DIR.checked) {
+      dc_dir_s = 1;
+    } else {
+      dc_dir_s = 2;
+    }
+
+    if(SP_DIR.checked) {
+      sp_dir_s = 1;
+    } else {
+      sp_dir_s =2;
+    }
+
+    var b_post = new XMLHttpRequest();
+    var header = 'a5 5a 80 9';
+    var head_m = 120;
+    // var dc_dir_s = DC_DIR;
+    var dc_power_s = Number(DC_POWER);
+    var dc_timer_s = Number(DC_TIMER);
+    var servo_s = Number(SERVO);
+    var id_s = Number(ID);
+    var sp_deg_s = Number(SP_DEG);
+    if (ID === "11") { // エレベータ(ステッピングモータの値を用いるとき)
+      // var cksm = head_m ^ dc_dir_s ^ dc_power_s ^ dc_timer_s ^ sp_dir_s ^ 1 ^ sp_deg_s ^ id_s;
+      var cksm = head_m ^ dc_dir_s ^ dc_power_s ^ dc_timer_s ^ sp_dir_s ^ 1 ^ sp_deg_s ^ sp_auto ^ id_s;
+    } else {
+      var cksm = head_m ^ dc_dir_s ^ dc_power_s ^ dc_timer_s ^ servo_s ^ sp_auto ^ id_s;
+    }
+    var sm_s = cksm.toString(16);
+
+    if (ID === "11") {// エレベータ(ステッピングモータの値を用いるとき)
+      // send_d = header + ' ' + head_m.toString(16) + ' ' + dc_dir_s + ' ' + dc_power_s.toString(16) + ' ' + dc_timer_s.toString(16) +' '+sp_dir_s.toString(16)+' 1 ' + sp_deg_s.toString(16) + ' ' + id_s.toString(16) + ' ' + sm_s;
+      send_d = header + ' ' + head_m.toString(16) + ' ' + dc_dir_s + ' ' + dc_power_s.toString(16) + ' ' + dc_timer_s.toString(16) +' '+sp_dir_s.toString(16)+' 1 ' + sp_deg_s.toString(16) + ' ' + sp_auto.toString(16) + ' ' + id_s.toString(16) + ' ' + sm_s;
+    } else {
+      // send_d = header + ' ' + head_m.toString(16) + ' ' + dc_dir_s + ' ' + dc_power_s.toString(16) + ' ' + dc_timer_s.toString(16) + ' 1 1 ' + servo_s.toString(16) + ' ' + id_s.toString(16) + ' ' + sm_s;
+      send_d = header + ' ' + head_m.toString(16) + ' ' + dc_dir_s + ' ' + dc_power_s.toString(16) + ' ' + dc_timer_s.toString(16) + ' 1 1 ' + servo_s.toString(16) + ' ' + sp_auto.toString(16) + ' ' + id_s.toString(16) + ' ' + sm_s;
+    }
+    console.log(send_d);
+
+    b_post.open('POST', SEND_SERVER, true);
+    b_post.setRequestHeader('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
+    b_post.send('con=' + send_d);
+    b_post.onreadystatechange = function () {
+      if (b_post.readyState === 4) {
+        if (b_post.status === 200) {
+          console.log('%cPOST_OK!', 'color: #00a0e9;');
+          bk.classList.add("ev");
+        }
+      }
+    }
+  }
+</script>
+
+</html>

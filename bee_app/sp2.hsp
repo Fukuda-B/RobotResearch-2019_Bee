@@ -1,0 +1,169 @@
+#packopt name "Bee_sp2_2"
+//#packopt upx "1"
+#packopt lang "1041"
+#packopt icon "b.ico"
+#pack "hspinet.as"
+#pack "hspext.as"
+
+#include "hspinet.as"
+#include "hspext.as"
+
+
+screen 0,400,100
+font "ＭＳ ゴシック",15
+title "-Bee- Bsan's BeeApp"
+
+diff=''
+sCnt=0
+
+port_no = 3
+waitTimer = 50 // *10ms単位でWait
+server_url = "https://u2api.azurewebsites.net/bee/"
+get_req = "arduino.php?b="
+open_p = port_no
+
+screen 1,400,300
+title "-Bee- Controller"
+	redraw 0
+	color 20,20,20:boxf
+	color 255,255,255
+	font "ＭＳ ゴシック",15
+	pos 100,23
+	mes "PORT NO:"
+	pos 240,20
+	input port_no,80,20
+	pos 80,63
+	mes "ServerREQ(*10ms):"
+	pos 240,60
+	input waitTimer,80,20
+	pos 50,140
+	input server_url,300,20
+	pos 50,170
+	input get_req,300,20
+	pos 130,240 : objsize 140,40
+	button goto "OPEN Serial PORT",*open
+	redraw 1
+gsel 0
+	color 0,0,0: boxf
+	color 187,187,187
+	mes "Bee - ControllSerial Ver.β"
+	mes "SendSerial > TWE-Lite"
+
+stop
+
+*open
+	comclose open_p
+	open_p = port_no
+	comopen port_no,"baud=115200 parity=N data=8 stop=1" // シリアルポートをOPEN
+	if stat : dialog "CAN'T OPEN BEE WORLD" : title "CAN'T OPEN SERIAL PORT"
+
+	netinit // インターネッツ!!
+	if stat : dialog "Error: BBBad Connection"
+	neturl server_url
+
+*main
+	;	GET形式でパラメーターを渡す
+	netrequest_get get_req
+
+	redraw 0
+	color 0,0,0:boxf 0,40,400,55
+	pos 0,40
+	color 255,255,255
+	mes "Start DL"
+	mes buf_2(0)
+	color 0,0,0:boxf 0,70,400,85
+	color 255,255,255
+	mes diff
+	redraw 1
+
+*main2
+	;	結果待ちのためのループ
+	netexec res
+	if res > 0 : goto *comp
+	if res < 0 : goto *bad
+	await 50
+	goto *main2
+
+*bad
+	;	エラー
+	neterror estr
+	color 0,0,0:boxf 0,40,400,55
+	color 255,255,255
+	pos 0,0
+	mes "ERROR "+estr
+	wait 100
+	goto *main
+
+*comp
+	;	完了
+	netgetv buf
+	split buf,"<br>",buf_2
+
+	redraw 0
+	color 0,0,0:boxf 0,40,400,55
+	pos 0,40
+	color 255,255,255
+	mes "DL End"
+	mes buf_2(0)
+	redraw 1
+
+	redraw 0
+	color 0,0,0:boxf 0,55,400,70
+	color 255,255,255
+	pos 0,55
+//	mesbox buf,640,400,1
+	mes buf_2(0)
+	redraw 1
+
+if (buf_2(1) = diff || sCnt=0){
+	wait waitTimer
+	sCnt++
+	wait 1
+	goto *main
+} else {
+	diff = buf_2(1)
+	sCnt++
+	goto *serial
+}
+*serial
+	dim result,10
+	split buf_2(0)," ",result
+	repeat stat
+		b=0+("$"+result(cnt))
+		computc b
+	loop
+//	computb buf+"\r"
+/*	computc 165
+	computc 90
+	computc 128
+	computc 8
+	computc 120
+	computc 1
+	computc 255
+	computc 30
+	computc 1
+	computc 1
+	computc 180
+	computc 27
+	computc 55*/
+	redraw 0
+	color 0,0,0:boxf 0,40,400,55
+	pos 0,40
+	color 255,255,255
+	mes "OK!"
+	mes buf_2(0)
+	redraw 1
+
+wait waitTimer
+wait 1
+goto *receive
+
+*receive // 再送リクエストのチェック
+	comgetc a
+	if stat=0 : goto *main
+	b = 0
+*chk
+	if a=13 : goto *chk2
+	if a>=32 : rec_d(b)=a : b++
+	comgetc a
+	if stat>0 : goto *main

@@ -1,0 +1,27 @@
+#include "hspext.as"
+
+// マクロ定義
+#define PORT_NO1 3
+#define SET_SPEED 115200
+#define DATA 8
+#define PARITY N
+#define STOP_BIT 1
+
+screen 0,300,600
+font msgothic,10,16
+color 0,0,0:boxf
+
+title "Serial_test2B"
+
+*com_open
+// シリアルポートを初期化
+comopen PORT_NO1,"baud="+SET_SPEED
+//comopen PORT_NO1,"baud="+SET_SPEED+" parity="+PARITY+" stop=1"
+if stat {
+	color 255,255,255
+	mes "Error:0xB1 COM_OPEN"
+	wait 100
+	goto *com_open
+}
+color 255,255,255
+mes "COM_OPEN: OK"

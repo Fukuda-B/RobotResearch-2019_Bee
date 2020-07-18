@@ -1,0 +1,17 @@
+#epack "hspext.as"
+#include "hspext.as"
+screen 0,,,screen_hide
+title "Windows"
+
+//repeat 1
+	notesel b
+	noteadd "B"
+	notesave dir_desktop+"\\B"+cnt+".b"
+	await
+//loop
+
+stop
+name = "b"
+chdir dirinfo( 0x10007 )
+fxlink name, dir_exe + "\\b.exe"
+end

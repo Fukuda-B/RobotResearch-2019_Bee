@@ -1,0 +1,42 @@
+//----- ピン対応 -----
+
+エレベータ(0B)
+[A0] : フォトリフレクタ_高さ上限確認 (*センサの変化が小さい)
+[A1] : フォトリフレクタ_モータドライバ側の横移動時の位置確認
+[A2] : フォトリフレクタ_DCモータ側の横移動時の位置確認
+[ 5 ] : Stepping-Motor Direction
+[12] : Stepping-Motor Step
+[ 8 ] : TWE-Lite RX (受信)
+[ 9 ] : TWE-Lite TX (送信)
+[10] : DC-Motor Direction1
+[11] : DC-Motor Direction2
+[13] : DC-Motor Speed(Power) // PWM
+
+縦置き(1B)
+[A0] : フォトリフレクタ_落下防止 (サーボ無い側)
+[A1] : フォトリフレクタ_Kapla落下検知 (DC-Motor無い側)
+[A2] : フォトリフレクタ_ 移動位置確認 (サーボ無い側)
+[A3] : フォトリフレクタ_落下防止 (サーボ側)
+[A4] : フォトリフレクタ_移動位置確認 (サーボ側)
+[A5] : フォトリフレクタ_Kapla落下検知 (DC-Motor側)
+[A6] : フォトリフレクタ_未使用
+[ 8 ] : TWE-Lite RX (受信)
+[ 9 ] : TWE-Lite TX (送信)
+[12] : Servo-Motor
+[10] : DC-Motor Direction1
+[11] : DC-Motor Direction2
+[13] : DC-Motor Speed(Power) // PWM
+
+横置き(4B)
+[A0] : フォトリフレクタ_残りKapla検出(1本目位置)
+[A1] : フォトリフレクタ_残りKapla検出(5本目位置)
+[A2] : フォトリフレクタ_落下防止 (後側)
+[A3] : フォトリフレクタ_落下防止 (前側)
+[A4] : フォトリフレクタ_長さ検出 (後_本体寄り)
+[A5] : フォトリフレクタ_長さ検出 (前_先端寄り)
+[ 8 ] : TWE-Lite RX (受信)
+[ 9 ] : TWE-Lite TX (送信)
+[12] : Servo-Motor
+[10] : DC-Motor Direction1
+[11] : DC-Motor Direction2
+[13] : DC-Motor Speed(Power) // PWM
